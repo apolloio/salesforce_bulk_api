@@ -32,7 +32,11 @@ require 'timeout'
         @server_url=@client.instance_url
       end
       @instance = parse_instance()
-      @@INSTANCE_HOST = "#{@instance}.salesforce.com"
+      if @instance.include? 'cloudforce.com'
+        @@INSTANCE_HOST = @instance
+      else
+        @@INSTANCE_HOST = "#{@instance}.salesforce.com"
+      end
     end
 
     def post_xml(host, path, xml, headers)
