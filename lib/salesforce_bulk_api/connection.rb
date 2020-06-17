@@ -82,8 +82,71 @@ require 'timeout'
     end
 
     def parse_instance()
-      @instance = @server_url.match(/https:\/\/[a-z]{2}[0-9]{1,2}/).to_s.gsub("https://","")
-      @instance = @server_url.split(".salesforce.com")[0].split("://")[1] if @instance.nil? || @instance.empty?
+      # the original parse_instance function parsed the following incorrectly
+      # 'https://td123.my.salesforce.com' => 'https://td12.my.salesforce.com'
+      # because of this stupid line:
+      # @instance = @server_url.match(/https:\/\/[a-z]{2}[0-9]{1,2}/).to_s.gsub("https://","")
+      # which makes incorrect assumptions
+      # 
+      # old function test
+      # User.where(:salesforce_instance_url.ne => nil).pluck(:salesforce_instance_url).uniq.each do |server_url|
+      #   instance = server_url.match(/https:\/\/[a-z]{2}[0-9]{1,2}/).to_s.gsub("https://","")
+      #   instance = server_url.split(".salesforce.com")[0].split("://")[1] if instance.nil? || instance.empty?
+      #   if instance.include? 'cloudforce.com'
+      #     host = instance
+      #   else
+      #     host = "#{instance}.salesforce.com"
+      #   end
+      #   if "https://#{host}" != server_url
+      #       puts "#{server_url} => #{host}"
+      #   end
+      # end
+      #
+      # old function result:
+      # https://na130.salesforce.com => na13.salesforce.com
+      # https://na112.salesforce.com => na11.salesforce.com
+      # https://na132.salesforce.com => na13.salesforce.com
+      # https://na174.salesforce.com => na17.salesforce.com
+      # https://na100.salesforce.com => na10.salesforce.com
+      # https://na124.salesforce.com => na12.salesforce.com
+      # https://na131.salesforce.com => na13.salesforce.com
+      # https://na136.salesforce.com => na13.salesforce.com
+      # https://na129.salesforce.com => na12.salesforce.com
+      # https://na134.salesforce.com => na13.salesforce.com
+      # https://na111.salesforce.com => na11.salesforce.com
+      # https://na102.salesforce.com => na10.salesforce.com
+      # https://na172.salesforce.com => na17.salesforce.com
+      # https://na115.salesforce.com => na11.salesforce.com
+      # https://na116.salesforce.com => na11.salesforce.com
+      # https://ns8.my.salesforce.com => ns8.salesforce.com
+      # https://na171.salesforce.com => na17.salesforce.com
+      # https://td123.my.salesforce.com => td12.salesforce.com
+      # https://na114.salesforce.com => na11.salesforce.com
+      # https://na135.salesforce.com => na13.salesforce.com
+      # https://na173.salesforce.com => na17.salesforce.com
+      # https://na101.salesforce.com => na10.salesforce.com
+      # https://na119.salesforce.com => na11.salesforce.com
+      # https://na122.salesforce.com => na12.salesforce.com
+      # https://eb1234.my.salesforce.com => eb12.salesforce.com
+      # https://na103.salesforce.com => na10.salesforce.com
+      # https://na123.salesforce.com => na12.salesforce.com
+      #
+      # new function test
+      # User.where(:salesforce_instance_url.ne => nil).pluck(:salesforce_instance_url).uniq.each do |server_url|
+      #   instance = server_url.split(".salesforce.com")[0].split("://")[1]
+      #   if instance.include? 'cloudforce.com'
+      #     host = instance
+      #   else
+      #     host = "#{instance}.salesforce.com"
+      #   end
+      #   if "https://#{host}" != server_url
+      #       puts "#{server_url} => #{host}"
+      #   end
+      # end; puts
+      #
+      # Original line deleted:
+      # @instance = @server_url.match(/https:\/\/[a-z]{2}[0-9]{1,2}/).to_s.gsub("https://","")
+      @instance = @server_url.split(".salesforce.com")[0].split("://")[1]
       return @instance
     end
 
